@@ -1,9 +1,9 @@
 {
-  "name": "applied-ai-roadmap",
+  "name": "ai_developer_roadmap",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://zuzah.github.io/applied-ai-roadmap",
+  "homepage": "https://zuzah.github.io/ai_developer_roadmap",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

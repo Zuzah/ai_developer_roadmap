@@ -2,8 +2,8 @@
 # DO NOT DELETE — shared context across all iterations
 
 ## Repo
-Name: applied-ai-roadmap
-URL: https://yourusername.github.io/applied-ai-roadmap/
+Name: ai_developer_roadmap
+URL: https://yourusername.github.io/ai_developer_roadmap/
 
 ## Stack
 - Vite + React + TypeScript
@@ -13,7 +13,7 @@ URL: https://yourusername.github.io/applied-ai-roadmap/
 
 ## Project Structure (final state)
 ```
-applied-ai-roadmap/
+ai_developer_roadmap/
 ├── .github/workflows/deploy.yml     # Auto-deploy to GitHub Pages
 ├── public/
 ├── src/
@@ -37,7 +37,7 @@ applied-ai-roadmap/
 │   └── index.css                    # Tailwind directives + CSS vars
 ├── index.html
 ├── package.json
-├── vite.config.ts                   # base: '/applied-ai-roadmap/'
+├── vite.config.ts                   # base: '/ai_developer_roadmap/'
 ├── tailwind.config.js
 ├── postcss.config.js
 └── tsconfig.json

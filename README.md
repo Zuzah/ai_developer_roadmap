@@ -2,7 +2,7 @@
 
 Personal 24-week roadmap for transitioning from full-stack development to Applied AI Engineering.
 
-**Live:** https://yourusername.github.io/applied-ai-roadmap/
+**Live:** https://yourusername.github.io/ai_developer_roadmap/
 
 ## Stack
 - Vite + React + TypeScript
