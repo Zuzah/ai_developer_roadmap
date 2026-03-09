@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design System Variables ─────────────────────────────── */
+:root {
+  --bg-base:      #02132F;
+  --bg-surface:   #051d45;
+  --bg-raised:    #071f4a;
+  --border:       #0a2d6e;
+  --text-primary: #FFFFFF;
+  --text-muted:   #7aafc4;
+  --text-dim:     #3a6a85;
+
+  /* Phase accent colors — all cyan-family for consistency */
+  --phase-1: #04CCFD;
+  --phase-2: #04CCFD;
+  --phase-3: #04CCFD;
+  --phase-4: #04CCFD;
+  --phase-5: #04CCFD;
+  --phase-6: #04CCFD;
+}
+
+/* ─── Base Reset ───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  min-height: 100vh;
+}
+
+/* ─── Typography Utilities ─────────────────────────────────── */
+.font-mono {
+  font-family: 'Courier New', 'Courier', monospace !important;
+}
+
+.label {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ─── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ─── Transitions ──────────────────────────────────────────── */
+.transition-base {
+  transition: all 0.15s ease;
+}
