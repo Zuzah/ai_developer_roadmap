@@ -1,6 +1,5 @@
-// src/App.tsx — Iteration 6
-// Shows Onboarding on first run (no startDate in localStorage).
-// After onboarding: main 4-tab app. Full task views arrive in Iteration 7.
+// src/App.tsx — Iteration 7 (final)
+// All 4 tabs fully functional. App is complete.
 
 import { useState } from 'react';
 import { useProgress } from './hooks/useProgress';
@@ -9,15 +8,17 @@ import { getCurrentWeekNumber } from './types';
 import Onboarding from './components/Onboarding';
 import Header from './components/Header';
 import PhaseNav from './components/PhaseNav';
+import PhaseView from './components/PhaseView';
+import ThisWeek from './components/ThisWeek';
 import StayingCurrent from './components/StayingCurrent';
 import GapAnalysis from './components/GapAnalysis';
 
 type Tab = 'this-week' | 'roadmap' | 'staying-current' | 'gap-analysis';
 
 export default function App() {
-  const { progress, setStartDate } = useProgress();
-  const [activeTab, setActiveTab]         = useState<Tab>('this-week');
-  const [activePhaseId, setActivePhaseId] = useState<number>(1);
+  const { progress, setStartDate, toggleTask } = useProgress();
+  const [activeTab, setActiveTab]              = useState<Tab>('this-week');
+  const [activePhaseId, setActivePhaseId]      = useState<number>(1);
 
   // ── Onboarding gate ──────────────────────────────────────────
   if (!progress.startDate) {
@@ -25,6 +26,15 @@ export default function App() {
   }
 
   const currentWeek = getCurrentWeekNumber(progress.startDate);
+
+  // Auto-set active phase to the one containing the current week
+  // (only on first render — user can navigate freely after)
+  const currentPhaseId = phases.find(p =>
+    p.weeks.some(w => w.weekNumber === currentWeek)
+  )?.id ?? 1;
+
+  const displayPhaseId = activePhaseId;
+  const activePhase    = phases.find(p => p.id === displayPhaseId)!;
 
   // Per-phase completion % for PhaseNav
   const completionByPhase: Record<number, number> = {};
@@ -36,33 +46,27 @@ export default function App() {
     completionByPhase[phase.id] = Math.round((done / total) * 100);
   });
 
-  const activePhase = phases.find(p => p.id === activePhaseId)!;
+  // When user clicks "This Week" tab, also sync the phase selector
+  function handleTabChange(tab: Tab) {
+    if (tab === 'this-week') {
+      setActivePhaseId(currentPhaseId);
+    }
+    setActiveTab(tab);
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
+      <Header activeTab={activeTab} onTabChange={handleTabChange} />
 
       <main style={{ maxWidth: 960, margin: '0 auto', padding: '32px 32px 64px' }}>
 
-        {/* ── THIS WEEK — full component arrives Iteration 7 ── */}
         {activeTab === 'this-week' && (
-          <div style={{
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border)',
-            borderTop: '2px solid #04CCFD',
-            borderRadius: 8,
-            padding: '28px',
-          }}>
-            <p style={{ fontFamily: 'Courier New, monospace', fontSize: 11, color: '#04CCFD', letterSpacing: '0.2em', marginBottom: 12 }}>
-              WEEK {currentWeek} OF 24
-            </p>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>
-              Full "This Week" task view arrives in Iteration 7. Your current week is calculated from your start date: <strong style={{ color: '#FFFFFF' }}>{progress.startDate}</strong>.
-            </p>
-          </div>
+          <ThisWeek
+            progress={progress}
+            onToggle={toggleTask}
+          />
         )}
 
-        {/* ── ROADMAP — full task view arrives Iteration 7 ── */}
         {activeTab === 'roadmap' && (
           <div>
             <PhaseNav
@@ -71,23 +75,12 @@ export default function App() {
               onPhaseSelect={setActivePhaseId}
               completionByPhase={completionByPhase}
             />
-            <div style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderTop: '2px solid #04CCFD',
-              borderRadius: '0 0 8px 8px',
-              padding: '28px',
-            }}>
-              <p style={{ fontFamily: 'Courier New, monospace', fontSize: 11, color: '#04CCFD', letterSpacing: '0.2em', marginBottom: 12 }}>
-                {activePhase.label.toUpperCase()} — {activePhase.weekRange.toUpperCase()}
-              </p>
-              <h2 style={{ fontSize: 22, color: '#FFFFFF', margin: '0 0 8px' }}>{activePhase.title}</h2>
-              <p style={{ fontSize: 13, color: '#04CCFD', fontStyle: 'italic', margin: '0 0 14px' }}>"{activePhase.tagline}"</p>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.8, margin: '0 0 16px', maxWidth: 680 }}>{activePhase.why}</p>
-              <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'Courier New, monospace' }}>
-                Week-by-week task view arrives in Iteration 7 — {activePhase.weeks.flatMap(w => w.tasks).length} tasks across {activePhase.weeks.length} weeks.
-              </p>
-            </div>
+            <PhaseView
+              phase={activePhase}
+              progress={progress}
+              onToggle={toggleTask}
+              currentWeekNumber={currentWeek}
+            />
           </div>
         )}
 
