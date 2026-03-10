@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Task, TaskType } from '../types';
+import TaskNotes from './TaskNotes';
 
 const TYPE_META: Record<TaskType, { label: string; color: string; icon: string }> = {
   setup:    { label: 'Setup',    color: '#F97316', icon: '⚙' },
@@ -88,17 +89,35 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
             textDecorationColor: 'var(--text-dim)',
             lineHeight: 1.4,
             userSelect: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
           }}
         >
           {task.title}
           {!task.required && (
             <span style={{
-              marginLeft: 8,
               fontFamily: 'Courier New, monospace',
               fontSize: 9,
               color: 'var(--text-dim)',
               letterSpacing: '0.1em',
             }}>BONUS</span>
+          )}
+          {task.notes && task.notes.length > 0 && (
+            <span style={{
+              fontFamily: 'Courier New, monospace',
+              fontSize: 9,
+              color: 'var(--accent)',
+              background: 'var(--accent-subtle)',
+              border: '1px solid var(--accent-border)',
+              borderRadius: 10,
+              padding: '1px 7px',
+              letterSpacing: '0.05em',
+              whiteSpace: 'nowrap',
+            }}>
+              📝 {task.notes.length} note{task.notes.length !== 1 ? 's' : ''}
+            </span>
           )}
         </span>
 
@@ -180,6 +199,10 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
             >
               ↗ {task.resource.label}
             </a>
+          )}
+
+          {task.notes && task.notes.length > 0 && (
+            <TaskNotes notes={task.notes} />
           )}
         </div>
       )}

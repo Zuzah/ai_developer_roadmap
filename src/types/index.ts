@@ -9,6 +9,28 @@ export interface Resource {
   url: string;
 }
 
+// ── Lesson Notes ─────────────────────────────────────────────────
+// Structured notes attached to a task — added as you study.
+// Each task can have multiple notes (one per sub-topic learned).
+
+export interface NotePoint {
+  title: string;            // e.g. "Define Success BEFORE you prompt"
+  bullets: string[];        // supporting detail lines
+}
+
+export interface TaskNote {
+  lessonTitle: string;      // e.g. "Define Success Criteria & Build Evaluations"
+  source?: Resource;        // where this specific lesson came from
+  keyTakeaway: string;      // the one-liner mental model
+  pipeline?: string[];      // optional: ordered steps e.g. ["Write Prompt", "Define Success"]
+  pipelineLabel?: string;   // optional label above the pipeline
+  points: NotePoint[];      // the numbered things to internalize
+  flashcard?: {             // optional: interview Q&A
+    question: string;
+    answer: string;
+  };
+}
+
 export interface Task {
   id: string;               // globally unique e.g. "w1-t1"
   type: TaskType;
@@ -17,6 +39,7 @@ export interface Task {
   estimatedMinutes: number;
   resource?: Resource;      // primary link for read/watch tasks
   required: boolean;        // false = bonus/optional
+  notes?: TaskNote[];       // lesson notes added as you study
 }
 
 export interface Week {

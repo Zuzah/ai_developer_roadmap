@@ -37,6 +37,52 @@ export const phases: Phase[] = [
             description: 'Read end-to-end. Focus on: XML tags for structured input, chain-of-thought prompting, and the role/context/task/constraint/format pattern. Take notes — you will use these patterns every week.',
             estimatedMinutes: 120,
             resource: { label: 'Anthropic Prompt Engineering Guide', url: 'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview' },
+            notes: [
+              {
+                lessonTitle: 'Define Success Criteria & Build Evaluations',
+                source: { label: 'Develop Tests — Anthropic Docs', url: 'https://platform.claude.com/docs/en/test-and-evaluate/develop-tests' },
+                keyTakeaway: 'A prompt without an eval is a feature without a test.',
+                pipelineLabel: 'The Pipeline to Remember',
+                pipeline: [
+                  'Write Prompt',
+                  'Define Success Criteria',
+                  'Build Evals',
+                  'Run + Grade',
+                  'Iterate',
+                ],
+                points: [
+                  {
+                    title: 'Define Success BEFORE you prompt',
+                    bullets: [
+                      'Success criteria must be Specific + Measurable = Testable',
+                      'Bad: "Give good summaries"',
+                      'Good: "Summaries under 100 words, score ≥ 4/5 on relevance"',
+                    ],
+                  },
+                  {
+                    title: 'Build Evals Like You Build Tests — 3 grading methods',
+                    bullets: [
+                      'Code-based (exact/string match) → for deterministic outputs → like unit tests',
+                      'LLM-based grading → for nuanced judgement (tone, relevance)',
+                      'Human grading → last resort only, does not scale',
+                      'Rule: More automated tests at 80% accuracy > fewer human-graded tests',
+                    ],
+                  },
+                  {
+                    title: 'The Grading Rubric Trick (for LLM-graded evals)',
+                    bullets: [
+                      'Force binary or scalar output from your grader LLM',
+                      'Bad rubric: "Grade whether the answer is safe"',
+                      'Good rubric: "Output only \'correct\' or \'incorrect\'. Incorrect if any PII detected."',
+                    ],
+                  },
+                ],
+                flashcard: {
+                  question: 'How do you evaluate the quality of a prompt?',
+                  answer: 'Define measurable success criteria first — accuracy rate, latency, format compliance — then build automated evals against a test set. Use string matching for simple outputs, LLM-based grading with a strict rubric for nuanced outputs. The goal is a repeatable, scalable feedback loop — same as CI for regular code.',
+                },
+              },
+            ],
           },
           {
             id: 'w1-t3', type: 'watch', required: true,
