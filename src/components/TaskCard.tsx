@@ -1,22 +1,20 @@
-// src/components/TaskCard.tsx
-// Individual task row with: type badge, checkbox, expand/collapse, resource link.
-// Used in both PhaseView (all weeks) and ThisWeek (current week only).
+// src/components/TaskCard.tsx — theme-aware, all colors via CSS variables
 
 import { useState } from 'react';
 import type { Task, TaskType } from '../types';
 
 const TYPE_META: Record<TaskType, { label: string; color: string; icon: string }> = {
-  setup:    { label: 'Setup',    color: '#fb923c', icon: '⚙' },
-  read:     { label: 'Read',     color: '#a78bfa', icon: '📖' },
-  watch:    { label: 'Watch',    color: '#34d399', icon: '▶' },
-  build:    { label: 'Build',    color: '#04CCFD', icon: '⚡' },
-  practice: { label: 'Practice', color: '#f59e0b', icon: '🔁' },
-  write:    { label: 'Write',    color: '#f472b6', icon: '✍' },
+  setup:    { label: 'Setup',    color: '#F97316', icon: '⚙' },
+  read:     { label: 'Read',     color: '#A78BFA', icon: '📖' },
+  watch:    { label: 'Watch',    color: '#34D399', icon: '▶' },
+  build:    { label: 'Build',    color: 'var(--accent)', icon: '⚡' },
+  practice: { label: 'Practice', color: '#FBBF24', icon: '🔁' },
+  write:    { label: 'Write',    color: '#F472B6', icon: '✍' },
 };
 
 interface TaskCardProps {
   task: Task;
-  index: number;          // 1-based display number
+  index: number;
   completed: boolean;
   onToggle: (id: string) => void;
 }
@@ -31,13 +29,13 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
 
   return (
     <div style={{
-      background: completed ? 'rgba(4,204,253,0.03)' : 'var(--bg-base)',
-      border: `1px solid ${completed ? 'rgba(4,204,253,0.15)' : 'var(--border)'}`,
-      borderLeft: `3px solid ${completed ? '#04CCFD44' : meta.color}`,
+      background: completed ? 'var(--accent-faint)' : 'var(--bg-surface)',
+      border: `1px solid ${completed ? 'var(--accent-border)' : 'var(--border)'}`,
+      borderLeft: `3px solid ${completed ? 'var(--accent)' : meta.color}`,
       borderRadius: 6,
       overflow: 'hidden',
       marginBottom: 6,
-      transition: 'border-color 0.2s, background 0.2s',
+      boxShadow: 'var(--shadow-sm)',
     }}>
 
       {/* ── Header row ── */}
@@ -49,28 +47,25 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
         cursor: 'pointer',
       }}>
 
-        {/* Step number + checkbox combined */}
+        {/* Checkbox / index */}
         <div
           onClick={() => onToggle(task.id)}
-          title={completed ? 'Mark incomplete' : 'Mark complete'}
           style={{
-            width: 24,
-            height: 24,
+            width: 24, height: 24,
             borderRadius: 4,
-            border: `1.5px solid ${completed ? '#04CCFD' : 'var(--text-dim)'}`,
-            background: completed ? '#04CCFD' : 'transparent',
+            border: `1.5px solid ${completed ? 'var(--accent)' : 'var(--border)'}`,
+            background: completed ? 'var(--accent)' : 'transparent',
             cursor: 'pointer',
             flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'all 0.15s',
           }}
         >
           {completed ? (
             <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-              <path d="M1 4L3.5 6.5L9 1" stroke="#02132F" strokeWidth="1.8"
-                strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M1 4L3.5 6.5L9 1" stroke="var(--accent-on)"
+                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           ) : (
             <span style={{
@@ -82,13 +77,13 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
           )}
         </div>
 
-        {/* Title — clicking expands */}
+        {/* Title */}
         <span
           onClick={() => setOpen(o => !o)}
           style={{
             flex: 1,
             fontSize: 13,
-            color: completed ? 'var(--text-muted)' : '#FFFFFF',
+            color: completed ? 'var(--text-muted)' : 'var(--text-primary)',
             textDecoration: completed ? 'line-through' : 'none',
             textDecorationColor: 'var(--text-dim)',
             lineHeight: 1.4,
@@ -107,22 +102,17 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
           )}
         </span>
 
-        {/* Right side meta */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          flexShrink: 0,
-        }}
+        {/* Meta: type badge + time + expand */}
+        <div
           onClick={() => setOpen(o => !o)}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}
         >
-          {/* Type badge */}
           <span style={{
             fontFamily: 'Courier New, monospace',
             fontSize: 9,
             color: meta.color,
-            background: `${meta.color}18`,
-            border: `1px solid ${meta.color}33`,
+            background: `color-mix(in srgb, ${meta.color} 12%, transparent)`,
+            border: `1px solid color-mix(in srgb, ${meta.color} 30%, transparent)`,
             padding: '2px 7px',
             borderRadius: 3,
             letterSpacing: '0.08em',
@@ -131,7 +121,6 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
             {meta.icon} {meta.label}
           </span>
 
-          {/* Time */}
           <span style={{
             fontFamily: 'Courier New, monospace',
             fontSize: 10,
@@ -142,14 +131,12 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
             {timeLabel}
           </span>
 
-          {/* Expand chevron */}
           <span style={{
-            fontSize: 14,
-            color: open ? '#04CCFD' : 'var(--text-dim)',
+            fontSize: 13,
+            color: open ? 'var(--accent)' : 'var(--text-dim)',
             transform: open ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.15s, color 0.15s',
-            userSelect: 'none',
             lineHeight: 1,
+            userSelect: 'none',
           }}>
             ▾
           </span>
@@ -159,9 +146,9 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
       {/* ── Expanded detail ── */}
       {open && (
         <div style={{
-          borderTop: '1px solid rgba(4,204,253,0.1)',
+          borderTop: '1px solid var(--border)',
           padding: '14px 14px 16px 48px',
-          background: 'rgba(0,0,0,0.15)',
+          background: 'var(--bg-raised)',
         }}>
           <p style={{
             fontSize: 13,
@@ -184,18 +171,11 @@ export default function TaskCard({ task, index, completed, onToggle }: TaskCardP
                 gap: 6,
                 fontFamily: 'Courier New, monospace',
                 fontSize: 11,
-                color: '#04CCFD',
+                color: 'var(--accent)',
                 textDecoration: 'none',
-                border: '1px solid rgba(4,204,253,0.3)',
+                border: '1px solid var(--accent-border)',
                 borderRadius: 4,
                 padding: '5px 12px',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(4,204,253,0.08)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
               }}
             >
               ↗ {task.resource.label}

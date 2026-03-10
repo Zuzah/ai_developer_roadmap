@@ -1,6 +1,4 @@
-// src/components/Onboarding.tsx
-// First-run experience — captures the user's intended start date.
-// Shows once. After submitting, App renders the main roadmap.
+// src/components/Onboarding.tsx — theme-aware, CSS variable-based
 
 import { useState } from 'react';
 
@@ -26,25 +24,21 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       justifyContent: 'center',
       padding: '32px',
     }}>
-      <div style={{
-        width: '100%',
-        maxWidth: 520,
-      }}>
+      <div style={{ width: '100%', maxWidth: 520 }}>
 
         {/* Wordmark */}
         <div style={{ marginBottom: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <div style={{
-              width: 8,
-              height: 8,
-              background: '#04CCFD',
+              width: 8, height: 8,
+              background: 'var(--accent)',
               borderRadius: '50%',
-              boxShadow: '0 0 10px #04CCFD',
+              boxShadow: 'var(--accent-glow)',
             }} />
             <span style={{
               fontFamily: 'Courier New, monospace',
               fontSize: 11,
-              color: '#04CCFD',
+              color: 'var(--accent)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
             }}>
@@ -66,15 +60,16 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         <div style={{
           background: 'var(--bg-surface)',
           border: '1px solid var(--border)',
-          borderTop: '2px solid #04CCFD',
+          borderTop: `2px solid var(--accent)`,
           borderRadius: 8,
           padding: '36px 32px 32px',
+          boxShadow: 'var(--shadow-md)',
         }}>
           <h1 style={{
             fontFamily: 'Georgia, serif',
             fontSize: 26,
             fontWeight: 700,
-            color: '#FFFFFF',
+            color: 'var(--text-primary)',
             margin: '0 0 12px',
             lineHeight: 1.3,
             letterSpacing: '-0.02em',
@@ -88,7 +83,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             lineHeight: 1.75,
             margin: '0 0 32px',
           }}>
-            Your start date anchors everything — every week, every task, every deadline 
+            Your start date anchors everything — every week, every task, every deadline
             cascades from this single date. You can start today or schedule a future date.
           </p>
 
@@ -98,14 +93,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               display: 'block',
               fontFamily: 'Courier New, monospace',
               fontSize: 10,
-              color: '#04CCFD',
+              color: 'var(--accent)',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               marginBottom: 10,
             }}>
               Start Date
             </label>
-
             <input
               type="date"
               value={date}
@@ -113,27 +107,26 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               onChange={e => setDate(e.target.value)}
               style={{
                 width: '100%',
-                background: 'var(--bg-base)',
-                border: '1px solid #04CCFD44',
+                background: 'var(--bg-raised)',
+                border: '1px solid var(--accent-border)',
                 borderRadius: 6,
                 padding: '12px 14px',
                 fontFamily: 'Courier New, monospace',
                 fontSize: 15,
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
                 outline: 'none',
                 cursor: 'pointer',
-                boxSizing: 'border-box',
-                colorScheme: 'dark',
+                boxSizing: 'border-box' as const,
               }}
             />
           </div>
 
           {/* Quick options */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap' as const }}>
             {[
-              { label: 'Today', days: 0 },
+              { label: 'Today',       days: 0 },
               { label: 'Next Monday', days: daysUntilNextMonday() },
-              { label: 'Next Month', days: daysUntilNextMonth() },
+              { label: 'Next Month',  days: daysUntilNextMonth() },
             ].map(({ label, days }) => {
               const d = new Date();
               d.setDate(d.getDate() + days);
@@ -146,13 +139,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   style={{
                     fontFamily: 'Courier New, monospace',
                     fontSize: 11,
-                    color: active ? '#02132F' : 'var(--text-muted)',
-                    background: active ? '#04CCFD' : 'var(--bg-base)',
-                    border: `1px solid ${active ? '#04CCFD' : 'var(--border)'}`,
+                    color: active ? 'var(--accent-on)' : 'var(--text-muted)',
+                    background: active ? 'var(--accent)' : 'var(--bg-raised)',
+                    border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
                     borderRadius: 4,
                     padding: '6px 14px',
                     cursor: 'pointer',
-                    transition: 'all 0.15s',
                     letterSpacing: '0.05em',
                   }}
                 >
@@ -162,10 +154,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             })}
           </div>
 
-          {/* What cascades from this */}
+          {/* What this unlocks */}
           <div style={{
-            background: 'rgba(4,204,253,0.05)',
-            border: '1px solid rgba(4,204,253,0.15)',
+            background: 'var(--accent-faint)',
+            border: '1px solid var(--accent-border)',
             borderRadius: 6,
             padding: '14px 16px',
             marginBottom: 28,
@@ -173,7 +165,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             <p style={{
               fontFamily: 'Courier New, monospace',
               fontSize: 10,
-              color: '#04CCFD',
+              color: 'var(--accent)',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
               marginBottom: 8,
@@ -187,7 +179,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               'Your Phase 6 target date is set automatically',
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 5, alignItems: 'flex-start' }}>
-                <span style={{ color: '#04CCFD', fontSize: 10, marginTop: 2 }}>✓</span>
+                <span style={{ color: 'var(--accent)', fontSize: 10, marginTop: 2 }}>✓</span>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>{item}</span>
               </div>
             ))}
@@ -202,25 +194,23 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             style={{
               width: '100%',
               padding: '14px',
-              background: hovered ? '#00b8e0' : '#04CCFD',
+              background: hovered ? 'var(--accent)' : 'var(--accent)',
+              opacity: hovered ? 0.9 : 1,
               border: 'none',
               borderRadius: 6,
               fontFamily: 'Courier New, monospace',
               fontSize: 13,
               fontWeight: 700,
-              color: '#02132F',
+              color: 'var(--accent-on)',
               cursor: date ? 'pointer' : 'not-allowed',
               letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              transition: 'background 0.15s',
-              opacity: date ? 1 : 0.5,
+              textTransform: 'uppercase' as const,
             }}
           >
             Begin the Journey →
           </button>
         </div>
 
-        {/* Footer note */}
         <p style={{
           textAlign: 'center',
           fontSize: 11,
@@ -236,12 +226,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 }
 
 function daysUntilNextMonday(): number {
-  const day = new Date().getDay(); // 0 Sun … 6 Sat
+  const day = new Date().getDay();
   return day === 1 ? 7 : (8 - day) % 7;
 }
 
 function daysUntilNextMonth(): number {
-  const now = new Date();
+  const now  = new Date();
   const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   return Math.round((next.getTime() - now.getTime()) / 86_400_000);
 }

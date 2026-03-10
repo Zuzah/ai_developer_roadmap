@@ -2,26 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design System Variables ─────────────────────────────── */
-:root {
-  --bg-base:      #02132F;
-  --bg-surface:   #051d45;
-  --bg-raised:    #071f4a;
-  --border:       #0a2d6e;
-  --text-primary: #FFFFFF;
-  --text-muted:   #7aafc4;
-  --text-dim:     #3a6a85;
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME (default) — refined, neutral dark
+   Inspired by GitHub dark / Linear / Vercel dashboard
+   Much less eye-fatiguing than saturated navy
+   ═══════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="dark"] {
+  --bg-base:        #0D1117;
+  --bg-surface:     #161B22;
+  --bg-raised:      #21262D;
+  --border:         #30363D;
+  --text-primary:   #E6EDF3;
+  --text-muted:     #8B949E;
+  --text-dim:       #484F58;
 
-  /* Phase accent colors — all cyan-family for consistency */
-  --phase-1: #04CCFD;
-  --phase-2: #04CCFD;
-  --phase-3: #04CCFD;
-  --phase-4: #04CCFD;
-  --phase-5: #04CCFD;
-  --phase-6: #04CCFD;
+  /* Accent: brand cyan */
+  --accent:         #38BDF8;
+  --accent-faint:   rgba(56,189,248,0.07);
+  --accent-subtle:  rgba(56,189,248,0.13);
+  --accent-border:  rgba(56,189,248,0.28);
+  --accent-hover:   rgba(56,189,248,0.18);
+  --accent-glow:    0 0 10px rgba(56,189,248,0.45);
+  --accent-on:      #0D1117;
+
+  /* Header sticky backdrop */
+  --header-bg:      rgba(13,17,23,0.92);
+
+  /* Shadows */
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.5);
+
+  color-scheme: dark;
 }
 
-/* ─── Base Reset ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME — Wave-inspired
+   Clean white surfaces, professional blue accent,
+   breathing room and subtle tonal hierarchy
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg-base:        #F6F8FA;
+  --bg-surface:     #FFFFFF;
+  --bg-raised:      #EFF2F5;
+  --border:         #D0D7DE;
+  --text-primary:   #1F2328;
+  --text-muted:     #57606A;
+  --text-dim:       #9198A1;
+
+  /* Accent: professional blue (Wave / GitHub light) */
+  --accent:         #0969DA;
+  --accent-faint:   rgba(9,105,218,0.07);
+  --accent-subtle:  rgba(9,105,218,0.12);
+  --accent-border:  rgba(9,105,218,0.25);
+  --accent-hover:   rgba(9,105,218,0.16);
+  --accent-glow:    none;
+  --accent-on:      #FFFFFF;
+
+  /* Header sticky backdrop */
+  --header-bg:      rgba(255,255,255,0.92);
+
+  /* Shadows */
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.10);
+
+  color-scheme: light;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -32,6 +82,7 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body {
@@ -39,9 +90,27 @@ body {
   color: var(--text-primary);
   font-family: 'Georgia', 'Times New Roman', serif;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* ─── Typography Utilities ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ═══════════════════════════════════════════════════════════════
+   DATE INPUT — theme-aware color scheme
+   ═══════════════════════════════════════════════════════════════ */
+input[type="date"] {
+  color-scheme: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
 .font-mono {
   font-family: 'Courier New', 'Courier', monospace !important;
 }
@@ -54,13 +123,13 @@ body {
   color: var(--text-dim);
 }
 
-/* ─── Scrollbar ────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+/* Smooth theme transitions on all elements */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+              box-shadow 0.2s ease;
+}
 
-/* ─── Transitions ──────────────────────────────────────────── */
-.transition-base {
-  transition: all 0.15s ease;
+/* Except transforms — don't want layout transitions */
+*[style*="transform"] {
+  transition: transform 0.15s ease;
 }

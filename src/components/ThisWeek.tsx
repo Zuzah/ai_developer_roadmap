@@ -1,6 +1,4 @@
-// src/components/ThisWeek.tsx
-// The daily driver tab. Shows exactly what to do this week — nothing else.
-// Designed for ADHD-friendly focus: one week, ordered tasks, no noise.
+// src/components/ThisWeek.tsx — theme-aware
 
 import TaskCard from './TaskCard';
 import { phases } from '../data/phases';
@@ -14,54 +12,39 @@ interface ThisWeekProps {
 
 export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
   const { startDate, completedTasks } = progress;
-
-  if (!startDate) return null; // guarded at App level but safety check
+  if (!startDate) return null;
 
   const currentWeekNum = getCurrentWeekNumber(startDate);
+  const currentWeek: Week | undefined = phases.flatMap(p => p.weeks).find(w => w.weekNumber === currentWeekNum);
+  const currentPhase = currentWeek ? phases.find(p => p.id === currentWeek.phaseId) : null;
 
-  // Find the current week object across all phases
-  const currentWeek: Week | undefined = phases
-    .flatMap(p => p.weeks)
-    .find(w => w.weekNumber === currentWeekNum);
-
-  const currentPhase = currentWeek
-    ? phases.find(p => p.id === currentWeek.phaseId)
-    : null;
-
-  // Date range display
   const weekStart = getWeekStartDate(startDate, currentWeekNum);
   const weekEnd   = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
   const dateRange = `${formatDate(weekStart)} → ${formatDate(weekEnd)}`;
 
-  // Completion stats
   const requiredTasks  = currentWeek?.tasks.filter(t => t.required) ?? [];
   const allTasks       = currentWeek?.tasks ?? [];
   const completedReq   = requiredTasks.filter(t => completedTasks[t.id]).length;
   const completedAll   = allTasks.filter(t => completedTasks[t.id]).length;
-  const pct            = requiredTasks.length > 0
-    ? Math.round((completedReq / requiredTasks.length) * 100)
-    : 0;
+  const pct            = requiredTasks.length > 0 ? Math.round((completedReq / requiredTasks.length) * 100) : 0;
 
-  // Look-ahead: next week info
   const nextWeekNum = Math.min(currentWeekNum + 1, 24);
   const nextWeek = phases.flatMap(p => p.weeks).find(w => w.weekNumber === nextWeekNum);
 
-  // Overall roadmap progress
-  const totalTasks = phases.flatMap(p => p.weeks).flatMap(w => w.tasks).length;
-  const doneTasks  = Object.values(completedTasks).filter(Boolean).length;
-  const overallPct = Math.round((doneTasks / totalTasks) * 100);
-
+  const totalTasks  = phases.flatMap(p => p.weeks).flatMap(w => w.tasks).length;
+  const doneTasks   = Object.values(completedTasks).filter(Boolean).length;
+  const overallPct  = Math.round((doneTasks / totalTasks) * 100);
   const weekComplete = pct === 100;
+  const GREEN = '#34D399';
 
   return (
     <div>
-
-      {/* ── Top bar: week identity ── */}
+      {/* ── Week identity card ── */}
       <div style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
-        borderLeft: weekComplete ? '3px solid #34d399' : '3px solid #04CCFD',
+        borderLeft: `3px solid ${weekComplete ? GREEN : 'var(--accent)'}`,
         borderRadius: 8,
         padding: '20px 24px',
         marginBottom: 12,
@@ -70,12 +53,13 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
         alignItems: 'flex-start',
         gap: 16,
         flexWrap: 'wrap',
+        boxShadow: 'var(--shadow-sm)',
       }}>
         <div>
           <p style={{
             fontFamily: 'Courier New, monospace',
             fontSize: 10,
-            color: weekComplete ? '#34d399' : '#04CCFD',
+            color: weekComplete ? GREEN : 'var(--accent)',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
             marginBottom: 6,
@@ -86,7 +70,7 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
           <h2 style={{
             fontSize: 'clamp(16px, 2.5vw, 22px)',
             fontWeight: 700,
-            color: '#FFFFFF',
+            color: 'var(--text-primary)',
             margin: '0 0 6px',
           }}>
             {currentWeek?.title ?? 'Week not found'}
@@ -107,38 +91,28 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
               margin: 0,
               maxWidth: 520,
             }}>
-              <strong style={{ color: 'rgba(255,255,255,0.6)' }}>This week:</strong>{' '}
+              <strong style={{ color: 'var(--text-primary)', opacity: 0.7, fontWeight: 600 }}>This week:</strong>{' '}
               {currentWeek.objective}
             </p>
           )}
         </div>
 
-        {/* Completion ring — text-based */}
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{
             fontFamily: 'Courier New, monospace',
             fontSize: 32,
             fontWeight: 700,
-            color: weekComplete ? '#34d399' : '#04CCFD',
+            color: weekComplete ? GREEN : 'var(--accent)',
             lineHeight: 1,
             marginBottom: 4,
           }}>
             {pct}%
           </div>
-          <div style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 10,
-            color: 'var(--text-dim)',
-            marginBottom: 4,
-          }}>
+          <div style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: 'var(--text-dim)', marginBottom: 4 }}>
             {completedReq}/{requiredTasks.length} required
           </div>
           {allTasks.length > requiredTasks.length && (
-            <div style={{
-              fontFamily: 'Courier New, monospace',
-              fontSize: 10,
-              color: 'var(--text-dim)',
-            }}>
+            <div style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: 'var(--text-dim)' }}>
               {completedAll - completedReq} bonus done
             </div>
           )}
@@ -147,16 +121,13 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
 
       {/* Progress bar */}
       <div style={{
-        height: 3,
-        background: 'var(--border)',
-        borderRadius: 2,
-        overflow: 'hidden',
-        marginBottom: 20,
+        height: 3, background: 'var(--border)', borderRadius: 2,
+        overflow: 'hidden', marginBottom: 20,
       }}>
         <div style={{
           height: '100%',
           width: `${pct}%`,
-          background: weekComplete ? '#34d399' : '#04CCFD',
+          background: weekComplete ? GREEN : 'var(--accent)',
           borderRadius: 2,
           transition: 'width 0.4s',
         }} />
@@ -175,7 +146,6 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
           }}>
             Tasks — Do in Order · ~{currentWeek.hoursEstimate}
           </p>
-
           {currentWeek.tasks.map((task, i) => (
             <TaskCard
               key={task.id}
@@ -188,121 +158,60 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
         </div>
       )}
 
-      {/* ── Bottom stats row ── */}
+      {/* ── Stats row ── */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
         gap: 8,
-        marginBottom: nextWeek ? 20 : 0,
+        marginBottom: nextWeek ? 12 : 0,
       }}>
-        {/* Overall progress */}
-        <div style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 6,
-          padding: '14px 16px',
-        }}>
-          <p style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 9,
-            color: 'var(--text-dim)',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
+        {[
+          { label: 'Overall Progress', value: `${overallPct}%`, sub: `${doneTasks}/${totalTasks} tasks`, accent: true },
+          { label: 'Weeks Remaining',  value: `${Math.max(24 - currentWeekNum, 0)}`, sub: 'of 24 total', accent: false },
+          { label: 'This Week',        value: currentWeek?.hoursEstimate ?? '—', sub: 'estimated', accent: false },
+        ].map(({ label, value, sub, accent }) => (
+          <div key={label} style={{
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            padding: '14px 16px',
+            boxShadow: 'var(--shadow-sm)',
           }}>
-            Overall Progress
-          </p>
-          <div style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 22,
-            fontWeight: 700,
-            color: '#04CCFD',
-            marginBottom: 4,
-          }}>
-            {overallPct}%
-          </div>
-          <div style={{
-            height: 2,
-            background: 'var(--border)',
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}>
+            <p style={{
+              fontFamily: 'Courier New, monospace',
+              fontSize: 9,
+              color: 'var(--text-dim)',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              marginBottom: 8,
+            }}>
+              {label}
+            </p>
             <div style={{
-              height: '100%',
-              width: `${overallPct}%`,
-              background: '#04CCFD',
-              borderRadius: 1,
-            }} />
+              fontFamily: 'Courier New, monospace',
+              fontSize: 22,
+              fontWeight: 700,
+              color: accent ? 'var(--accent)' : 'var(--text-primary)',
+              marginBottom: 4,
+            }}>
+              {value}
+            </div>
+            {accent && (
+              <div style={{
+                height: 2, background: 'var(--border)', borderRadius: 1,
+                overflow: 'hidden', marginBottom: 6,
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${overallPct}%`,
+                  background: 'var(--accent)',
+                  borderRadius: 1,
+                }} />
+              </div>
+            )}
+            <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{sub}</div>
           </div>
-        </div>
-
-        {/* Weeks remaining */}
-        <div style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 6,
-          padding: '14px 16px',
-        }}>
-          <p style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 9,
-            color: 'var(--text-dim)',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
-          }}>
-            Weeks Remaining
-          </p>
-          <div style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 22,
-            fontWeight: 700,
-            color: '#FFFFFF',
-            marginBottom: 4,
-          }}>
-            {Math.max(24 - currentWeekNum, 0)}
-          </div>
-          <div style={{
-            fontSize: 11,
-            color: 'var(--text-dim)',
-          }}>
-            of 24 total
-          </div>
-        </div>
-
-        {/* Total time this week */}
-        <div style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 6,
-          padding: '14px 16px',
-        }}>
-          <p style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 9,
-            color: 'var(--text-dim)',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
-          }}>
-            This Week
-          </p>
-          <div style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 22,
-            fontWeight: 700,
-            color: '#FFFFFF',
-            marginBottom: 4,
-          }}>
-            {currentWeek?.hoursEstimate ?? '—'}
-          </div>
-          <div style={{
-            fontSize: 11,
-            color: 'var(--text-dim)',
-          }}>
-            estimated
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* ── Up next ── */}
@@ -316,6 +225,7 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 12,
+          boxShadow: 'var(--shadow-sm)',
         }}>
           <div>
             <p style={{
@@ -328,20 +238,11 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
             }}>
               Up Next · Week {nextWeekNum}
             </p>
-            <p style={{
-              fontSize: 13,
-              color: 'var(--text-muted)',
-              margin: 0,
-            }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
               {nextWeek.title}
             </p>
           </div>
-          <span style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 10,
-            color: 'var(--text-dim)',
-            flexShrink: 0,
-          }}>
+          <span style={{ fontFamily: 'Courier New, monospace', fontSize: 10, color: 'var(--text-dim)', flexShrink: 0 }}>
             {nextWeek.tasks.length} tasks →
           </span>
         </div>
@@ -355,23 +256,11 @@ export default function ThisWeek({ progress, onToggle }: ThisWeekProps) {
           padding: '24px',
           textAlign: 'center',
         }}>
-          <p style={{
-            fontFamily: 'Courier New, monospace',
-            fontSize: 12,
-            color: '#34d399',
-            letterSpacing: '0.15em',
-            marginBottom: 8,
-          }}>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: 12, color: GREEN, letterSpacing: '0.15em', marginBottom: 8 }}>
             ROADMAP COMPLETE
           </p>
-          <p style={{
-            fontSize: 14,
-            color: 'var(--text-muted)',
-            lineHeight: 1.7,
-            margin: 0,
-          }}>
-            24 weeks. 10 projects. You did the work.<br />
-            Time to apply.
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>
+            24 weeks. 10 projects. You did the work.<br />Time to apply.
           </p>
         </div>
       )}

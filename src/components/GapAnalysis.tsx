@@ -1,32 +1,32 @@
-// src/components/GapAnalysis.tsx
-// Renders the "Gap Analysis" tab — verdict on the LinkedIn post, per-claim cards,
-// and the senior engineer advantage section.
+// src/components/GapAnalysis.tsx — theme-aware
 
 import { postSummary, gapClaims, seniorEngineerAdvantage } from '../data/gap-analysis';
 
+// Verdict colors — semantic, intentionally not theme-aware
 const VERDICT_COLORS: Record<string, string> = {
-  'True':               '#34d399',
-  'Mostly True':        '#04CCFD',
-  'True & Underrated':  '#04CCFD',
-  'Contextually True':  '#a78bfa',
-  'True for Now':       '#fb923c',
+  'True':               '#34D399',
+  'Mostly True':        '#38BDF8',
+  'True & Underrated':  '#38BDF8',
+  'Contextually True':  '#A78BFA',
+  'True for Now':       '#FB923C',
 };
 
 export default function GapAnalysis() {
   return (
     <div>
-      {/* ── Overall verdict ── */}
+      {/* Overall verdict */}
       <div style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
         borderRadius: 8,
         padding: '20px 24px',
         marginBottom: 20,
+        boxShadow: 'var(--shadow-sm)',
       }}>
         <p style={{
           fontFamily: 'Courier New, monospace',
           fontSize: 10,
-          color: '#04CCFD',
+          color: 'var(--accent)',
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           marginBottom: 12,
@@ -36,23 +36,18 @@ export default function GapAnalysis() {
         <p style={{
           fontSize: 15,
           fontWeight: 600,
-          color: '#FFFFFF',
+          color: 'var(--text-primary)',
           lineHeight: 1.5,
           margin: '0 0 10px',
         }}>
           {postSummary.verdict}
         </p>
-        <p style={{
-          fontSize: 13,
-          color: 'var(--text-muted)',
-          lineHeight: 1.8,
-          margin: 0,
-        }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.8, margin: 0 }}>
           {postSummary.detail}
         </p>
       </div>
 
-      {/* ── Per-claim analysis ── */}
+      {/* Claims */}
       <div style={{ marginBottom: 24 }}>
         <p style={{
           fontFamily: 'Courier New, monospace',
@@ -66,17 +61,17 @@ export default function GapAnalysis() {
         </p>
 
         {gapClaims.map(claim => {
-          const color = VERDICT_COLORS[claim.verdict] ?? '#04CCFD';
+          const color = VERDICT_COLORS[claim.verdict] ?? 'var(--accent)';
           return (
             <div key={claim.id} style={{
               background: 'var(--bg-surface)',
-              border: `1px solid ${color}22`,
+              border: '1px solid var(--border)',
               borderLeft: `3px solid ${color}`,
               borderRadius: 6,
               padding: '16px 20px',
               marginBottom: 10,
+              boxShadow: 'var(--shadow-sm)',
             }}>
-              {/* Claim + verdict badge */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -87,7 +82,7 @@ export default function GapAnalysis() {
               }}>
                 <p style={{
                   fontSize: 13,
-                  color: '#FFFFFF',
+                  color: 'var(--text-primary)',
                   fontStyle: 'italic',
                   margin: 0,
                   flex: 1,
@@ -99,8 +94,8 @@ export default function GapAnalysis() {
                   fontFamily: 'Courier New, monospace',
                   fontSize: 9,
                   color,
-                  background: `${color}18`,
-                  border: `1px solid ${color}44`,
+                  background: `color-mix(in srgb, ${color} 12%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
                   padding: '3px 9px',
                   borderRadius: 3,
                   letterSpacing: '0.1em',
@@ -112,14 +107,7 @@ export default function GapAnalysis() {
                   {claim.verdict}
                 </span>
               </div>
-
-              {/* Analysis */}
-              <p style={{
-                fontSize: 12,
-                color: 'var(--text-muted)',
-                lineHeight: 1.75,
-                margin: 0,
-              }}>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.75, margin: 0 }}>
                 {claim.analysis}
               </p>
             </div>
@@ -127,17 +115,17 @@ export default function GapAnalysis() {
         })}
       </div>
 
-      {/* ── Senior engineer advantage ── */}
+      {/* Senior engineer advantage */}
       <div style={{
-        background: 'rgba(4,204,253,0.05)',
-        border: '1px solid rgba(4,204,253,0.2)',
+        background: 'var(--accent-faint)',
+        border: '1px solid var(--accent-border)',
         borderRadius: 8,
         padding: '20px 24px',
       }}>
         <p style={{
           fontFamily: 'Courier New, monospace',
           fontSize: 10,
-          color: '#04CCFD',
+          color: 'var(--accent)',
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           marginBottom: 14,
@@ -153,11 +141,10 @@ export default function GapAnalysis() {
             marginBottom: i < seniorEngineerAdvantage.points.length - 1 ? 12 : 0,
           }}>
             <div style={{
-              width: 20,
-              height: 20,
+              width: 20, height: 20,
               borderRadius: '50%',
-              background: 'rgba(4,204,253,0.12)',
-              border: '1px solid rgba(4,204,253,0.3)',
+              background: 'var(--accent-subtle)',
+              border: '1px solid var(--accent-border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -167,18 +154,13 @@ export default function GapAnalysis() {
               <span style={{
                 fontFamily: 'Courier New, monospace',
                 fontSize: 10,
-                color: '#04CCFD',
+                color: 'var(--accent)',
                 fontWeight: 700,
               }}>
                 {i + 1}
               </span>
             </div>
-            <p style={{
-              margin: 0,
-              fontSize: 13,
-              color: 'var(--text-muted)',
-              lineHeight: 1.75,
-            }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.75 }}>
               {point}
             </p>
           </div>
