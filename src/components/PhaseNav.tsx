@@ -1,6 +1,5 @@
-// src/components/PhaseNav.tsx
-// 6-phase selector grid. Shows phase label, title, week range.
-// Completion % comes from progress prop — wired in Iteration 6.
+// src/components/PhaseNav.tsx — Iteration 6
+// Phase selector grid with completion % derived from task completions.
 
 import type { Phase } from '../types';
 
@@ -8,103 +7,90 @@ interface PhaseNavProps {
   phases: Phase[];
   activePhaseId: number;
   onPhaseSelect: (id: number) => void;
-  completionByPhase: Record<number, number>; // phaseId → 0–100
+  completionByPhase: Record<number, number>;
 }
 
-export default function PhaseNav({
-  phases,
-  activePhaseId,
-  onPhaseSelect,
-  completionByPhase,
-}: PhaseNavProps) {
+export default function PhaseNav({ phases, activePhaseId, onPhaseSelect, completionByPhase }: PhaseNavProps) {
   return (
     <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 1fr)',
-      gap: 8,
-      marginBottom: 24,
+      gap: 6,
+      marginBottom: 0,
     }}>
       {phases.map(phase => {
-        const isActive = phase.id === activePhaseId;
-        const pct = completionByPhase[phase.id] ?? 0;
+        const active = phase.id === activePhaseId;
+        const pct    = completionByPhase[phase.id] ?? 0;
+        const totalTasks = phase.weeks.flatMap(w => w.tasks).length;
 
         return (
           <button
             key={phase.id}
             onClick={() => onPhaseSelect(phase.id)}
             style={{
-              background: isActive ? 'rgba(4,204,253,0.08)' : 'var(--bg-surface)',
-              border: `1px solid ${isActive ? '#04CCFD' : 'var(--border)'}`,
-              borderRadius: 6,
-              padding: '12px 14px',
+              background: active ? 'var(--bg-raised)' : 'var(--bg-surface)',
+              border: `1px solid ${active ? '#04CCFD44' : 'var(--border)'}`,
+              borderBottom: active ? '1px solid var(--bg-raised)' : '1px solid var(--border)',
+              borderRadius: active ? '6px 6px 0 0' : 6,
+              padding: '12px 14px 10px',
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.15s',
-              position: 'relative',
-              overflow: 'hidden',
             }}
           >
-            {/* Progress bar underlay */}
-            {pct > 0 && (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                width: `${pct}%`,
-                height: 2,
-                background: '#04CCFD',
-                opacity: 0.6,
-                transition: 'width 0.3s ease',
-              }} />
-            )}
-
-            {/* Phase label + weeks */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 5,
-            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <span style={{
                 fontFamily: 'Courier New, monospace',
-                fontSize: 10,
-                color: '#04CCFD',
-                letterSpacing: '0.15em',
+                fontSize: 9,
+                color: active ? '#04CCFD' : 'var(--text-dim)',
+                letterSpacing: '0.2em',
                 textTransform: 'uppercase',
               }}>
                 {phase.label}
               </span>
-              {pct > 0 && (
-                <span style={{
-                  fontFamily: 'Courier New, monospace',
-                  fontSize: 10,
-                  color: pct === 100 ? '#04CCFD' : 'var(--text-dim)',
-                }}>
-                  {pct}%
-                </span>
-              )}
+              <span style={{
+                fontFamily: 'Courier New, monospace',
+                fontSize: 9,
+                color: pct > 0 ? '#04CCFD' : 'var(--text-dim)',
+              }}>
+                {pct}%
+              </span>
             </div>
 
-            {/* Phase title */}
             <p style={{
-              fontSize: 12,
-              color: isActive ? '#FFFFFF' : 'var(--text-muted)',
-              fontWeight: isActive ? 600 : 400,
-              lineHeight: 1.35,
-              margin: '0 0 4px',
+              fontSize: 11,
+              color: active ? '#FFFFFF' : 'var(--text-muted)',
+              margin: '0 0 8px',
+              lineHeight: 1.4,
             }}>
               {phase.title}
             </p>
 
-            {/* Week range */}
-            <p style={{
-              fontFamily: 'Courier New, monospace',
-              fontSize: 10,
-              color: 'var(--text-dim)',
-              margin: 0,
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <span style={{
+                fontFamily: 'Courier New, monospace',
+                fontSize: 9,
+                color: 'var(--text-dim)',
+              }}>
+                {phase.weekRange} · {totalTasks} tasks
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div style={{
+              height: 2,
+              background: 'var(--border)',
+              borderRadius: 1,
+              overflow: 'hidden',
             }}>
-              {phase.weeks}
-            </p>
+              <div style={{
+                height: '100%',
+                width: `${pct}%`,
+                background: '#04CCFD',
+                borderRadius: 1,
+                transition: 'width 0.3s',
+              }} />
+            </div>
           </button>
         );
       })}

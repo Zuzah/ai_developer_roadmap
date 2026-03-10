@@ -1,49 +1,44 @@
-// src/types/index.ts
-// All TypeScript interfaces for the roadmap app.
-// Imported by all data files and components.
-// Do not modify field names without updating data files and components together.
+// src/types/index.ts — Iteration 6 restructure
+// New hierarchy: Phase → Week → Task
+// Progress is now purely task-based (skills/projects removed)
+
+export type TaskType = 'setup' | 'read' | 'watch' | 'build' | 'practice' | 'write';
 
 export interface Resource {
   label: string;
   url: string;
 }
 
-export interface Skill {
-  id: string;             // unique key e.g. "p1-prompt-structure"
-  name: string;
-  details: string[];
+export interface Task {
+  id: string;               // globally unique e.g. "w1-t1"
+  type: TaskType;
+  title: string;
+  description: string;      // concrete instruction, 1–2 sentences
+  estimatedMinutes: number;
+  resource?: Resource;      // primary link for read/watch tasks
+  required: boolean;        // false = bonus/optional
 }
 
-export interface Project {
-  id: string;             // unique key e.g. "p1-receipt-manager"
-  week: string;           // e.g. "Week 3" | "Weeks 14–15"
-  name: string;
-  language: string;       // e.g. "Python" | "Go" | "Python + TypeScript"
-  category: 'Corp' | 'Space' | 'Automotive' | 'Portfolio';
-  description: string;
-  features: string[];
-  successCriteria: string[];
-  repoUrl?: string;       // added later as projects are built
+export interface Week {
+  id: string;               // "w1" … "w24"
+  weekNumber: number;       // 1–24
+  phaseId: number;
+  title: string;
+  objective: string;        // "By end of this week you will be able to..."
+  hoursEstimate: string;
+  tasks: Task[];            // ordered — do top to bottom
 }
 
 export interface Phase {
   id: number;
-  label: string;          // "Phase 1"
-  title: string;          // "Claude Mastery & Prompt Engineering"
-  weeks: string;          // "Weeks 1–4"
-  hoursPerWeek: string;   // "5–10 hrs/week"
-  color: string;          // CSS color string
-  tagline: string;        // motivational one-liner
-  goal: string;           // phase objective sentence
-  why: string;            // why this phase matters (2–3 sentences)
-  skills: Skill[];
-  projects: Project[];
-  resources: Resource[];
-}
-
-export interface CadenceBlock {
-  cadence: string;        // "Daily (15 min)"
-  items: string[];
+  label: string;            // "Phase 1"
+  title: string;
+  weekRange: string;        // "Weeks 1–4"
+  color: string;
+  tagline: string;
+  goal: string;
+  why: string;
+  weeks: Week[];
 }
 
 export interface GapClaim {
@@ -53,8 +48,34 @@ export interface GapClaim {
   analysis: string;
 }
 
-// Stored in localStorage under key 'roadmap-progress'
+export interface CadenceBlock {
+  cadence: string;
+  items: string[];
+}
+
+// ── localStorage key: 'roadmap-v2' ───────────────────────────────
 export interface ProgressState {
-  completedSkills: Record<string, boolean>;    // key: skill.id
-  completedProjects: Record<string, boolean>;  // key: project.id
+  startDate: string | null;                 // ISO e.g. "2026-03-09"
+  completedTasks: Record<string, boolean>;  // key: task.id
+}
+
+// ── Utility helpers ───────────────────────────────────────────────
+export function getCurrentWeekNumber(startDate: string): number {
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.floor((today.getTime() - start.getTime()) / 86_400_000);
+  return Math.min(Math.max(Math.floor(days / 7) + 1, 1), 24);
+}
+
+export function getWeekStartDate(startDate: string, weekNumber: number): Date {
+  const d = new Date(startDate);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + (weekNumber - 1) * 7);
+  return d;
+}
+
+export function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 }
